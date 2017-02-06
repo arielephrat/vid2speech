@@ -1,4 +1,4 @@
-# vid2speech
+# vid2speech - work in progress...
 
 This is the code for the paper  
 **[Vid2speech: Speech Reconstruction from Silent Video](http://www.cs.huji.ac.il/~peleg/papers/arXiv1701.00495-Vid2Speech.pdf)**
@@ -30,7 +30,7 @@ Keras was used with the TensorFlow backend.
 Download one speaker's videos from the [GRID Corpus](http://spandh.dcs.shef.ac.uk/gridcorpus/), and save the videos directly in the ```/dataset``` folder.  
 This code has been tested on the high quality videos of speakers 2 (male) and 4 (female).
 
-Next, rip the audio part of each video and save as the same filename with extension ```.mpg``` replaced with ```.wav```.  
+Next, strip the audio part of each video and save as the same filename with extension ```.mpg``` replaced with ```.wav```.  
 The supplied ```strip_audio.sh``` script can be used:
 ```shell
 cd dataset
