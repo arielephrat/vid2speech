@@ -32,17 +32,19 @@ nb_pool = 2
 BATCH_SIZE = 32
 DROPOUT = 0.25 
 DROPOUT2 = 0.5
-EPOCHS = 1
+EPOCHS = 20
+FINETUNE_EPOCHS = 5
 activation_func2 = 'tanh'
 
 respath = '../results/'
+weight_path = join(respath,'weights/')
 datapath = '../dataset/'
 
 def load_data(datapath):
 	viddata_path = join(datapath,'viddata.npy')
 	auddata_path = join(datapath,'auddata.npy')
 	if isfile(viddata_path) and isfile(auddata_path):
-		print ('Loading data...',)
+		print ('Loading data...')
 		viddata = np.load(viddata_path)
 		auddata = np.load(auddata_path)
 		vidctr = len(auddata)
@@ -50,10 +52,11 @@ def load_data(datapath):
 	else:
 		print ('Preprocessed data not found.')
 		sys.exit()
-	Xtr = viddata[:int(vidctr*TRAIN_PER)]
-	Ytr = auddata[:int(vidctr*TRAIN_PER)]
-	Xte = viddata[int(vidctr*TRAIN_PER)]
-	Yte = auddata[int(vidctr*TRAIN_PER)]
+
+	Xtr = viddata[:int(vidctr*TRAIN_PER),:,:,:]
+	Ytr = auddata[:int(vidctr*TRAIN_PER),:]
+	Xte = viddata[int(vidctr*TRAIN_PER):,:,:,:]
+	Yte = auddata[int(vidctr*TRAIN_PER):,:]
 	return (Xtr, Ytr), (Xte, Yte)
 
 def build_model(net_out):
@@ -104,7 +107,7 @@ def build_model(net_out):
 	model.add(Dense(net_out))
 	return model
 
-def savedata(Ytr, Ytr_pred, Yte, Yte_pred):
+def savedata(Ytr, Ytr_pred, Yte, Yte_pred, respath=respath):
 	np.save(join(respath,'Ytr.npy'),Ytr)
 	np.save(join(respath,'Ytr_pred.npy'),Ytr_pred)
 	np.save(join(respath,'Yte.npy'),Yte)
@@ -126,22 +129,22 @@ def standardize_data(Xtr, Ytr, Xte, Yte):
 
 def train_net(model, Xtr, Ytr_norm, Xte, Yte_norm, batch_size=BATCH_SIZE, epochs=EPOCHS, finetune=False):
 	if finetune:
-		newest = max(glob.iglob(respath+'*.hdf5'), key=os.path.getctime)
+		newest = max(glob.iglob(weight_path+'*.hdf5'), key=os.path.getctime)
 		model.load_weights(newest)
 		lr = LR/10
 	else:
 		lr = LR
 	adam = Adam(lr=lr)
 	model.compile(loss='mean_squared_error', optimizer=adam)
-	checkpointer = ModelCheckpoint(filepath=respath+'weights.{epoch:02d}-{val_loss:.4f}.hdf5',
+	checkpointer = ModelCheckpoint(filepath=weight_path+'weights.{epoch:02d}-{val_loss:.4f}.hdf5',
 		monitor='val_loss', verbose=1, save_best_only=True)
 	history = model.fit(Xtr, Ytr_norm, batch_size=batch_size, nb_epoch=epochs,
-		      show_accuracy=False, verbose=1, validation_data=(Xte, Yte_norm),callbacks=[checkpointer])
-	newest = max(glob.iglob(respath+'*.hdf5'), key=os.path.getctime)
+		verbose=1, validation_data=(Xte, Yte_norm),callbacks=[checkpointer])
+	newest = max(glob.iglob(weight_path+'*.hdf5'), key=os.path.getctime)
 	model.load_weights(newest)
 	return model
 
-def predict(Xtr, Xte, Y_means, Y_stds, batch_size=BATCH_SIZE):
+def predict(model, Xtr, Xte, Y_means, Y_stds, batch_size=BATCH_SIZE):
 	Ytr_pred = model.predict(Xtr, batch_size=batch_size, verbose=1)
 	Yte_pred = model.predict(Xte, batch_size=batch_size, verbose=1)
 	Ytr_pred = (Ytr_pred*Y_stds+Y_means)
@@ -149,14 +152,15 @@ def predict(Xtr, Xte, Y_means, Y_stds, batch_size=BATCH_SIZE):
 	return Ytr_pred, Yte_pred
 
 def main():
-	if not os.path.exists(respath):
-		os.makedirs(respath)
+	if not os.path.exists(weight_path):
+		os.makedirs(weight_path)
 	(Xtr,Ytr), (Xte, Yte) = load_data(datapath)
 	net_out = Ytr.shape[1]
 	Xtr, Ytr_norm, Xte, Yte_norm, Y_means, Y_stds = standardize_data(Xtr, Ytr, Xte, Yte)
 	model = build_model(net_out)
 	model = train_net(model, Xtr, Ytr_norm, Xte, Yte_norm)
-	Ytr_pred, Yte_pred = predict(Xtr, Xte, Y_means, Y_stds)
+	model = train_net(model, Xtr, Ytr_norm, Xte, Yte_norm, epochs=FINETUNE_EPOCHS, finetune=True)
+	Ytr_pred, Yte_pred = predict(model, Xtr, Xte, Y_means, Y_stds)
 	savedata(Ytr, Ytr_pred, Yte, Yte_pred)
 
 if __name__ == "__main__":

@@ -43,5 +43,19 @@ cd ../code
 python process_data.py
 python train.py
 ```
+## Generate video samples with reconstructed audio
+```shell
+python gen_samples.py
+```
+Samples will appear in ```../results/samples/```
 
-#### Please report all bugs to arielephrat@cs.huji.ac.il
+## Use pre-trained model to predict and generate samples
+```shell
+python predict.py --weight_path <path_to_weights>
+python gen_samples.py --respath '../pretrained_results'
+```
+Weights for a pre-trained model of speaker 2 are supplied in
+```pretrained_weights/s2.hdf5```
+
+
+#### Please be in touch with arielephrat@cs.huji.ac.il with any questions or bug reports. Enjoy!
