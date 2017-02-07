@@ -43,7 +43,7 @@ cd ../code
 python process_data.py
 python train.py
 ```
-Training one one entire GRID speaker (1000 videos) with the supplied settings takes ~12 hours on one Titan Black GPU.
+Training one entire GRID speaker (1000 videos) with the supplied settings takes ~12 hours on one Titan Black GPU.
 
 ## Generate video samples with reconstructed audio
 ```shell
