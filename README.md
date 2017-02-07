@@ -31,7 +31,7 @@ Download one speaker's videos from the [GRID Corpus](http://spandh.dcs.shef.ac.u
 This code has been tested on the high quality videos of speakers 2 (male) and 4 (female).
 
 Next, strip the audio part of each video and save as the same filename with extension ```.mpg``` replaced with ```.wav```.  
-The supplied ```strip_audio.sh``` script can be used:
+The supplied ```strip_audio.sh``` script can be used (requires ffmpeg).
 ```shell
 cd dataset
 sh strip_audio.sh
