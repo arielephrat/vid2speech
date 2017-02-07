@@ -52,13 +52,11 @@ python gen_samples.py
 Samples will appear in ```../results/samples/```
 
 ## Use pre-trained model to predict and generate samples
+Data must first be preprocessed with ```process_data.py```
 ```shell
 python predict.py --weight_path <path_to_weights>
 python gen_samples.py --respath '../pretrained_results'
 ```
-Weights for a pre-trained model of speaker 2 are supplied in
-```
-pretrained_weights/s2.hdf5
-```
+Weights for a pre-trained model of speaker 2 are supplied in ```pretrained_weights/s2.hdf5```
 
 #### Please be in touch with arielephrat@cs.huji.ac.il with any questions or bug reports. Enjoy!
