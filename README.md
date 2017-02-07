@@ -57,7 +57,8 @@ python predict.py --weight_path <path_to_weights>
 python gen_samples.py --respath '../pretrained_results'
 ```
 Weights for a pre-trained model of speaker 2 are supplied in
-```pretrained_weights/s2.hdf5```
-
+```
+pretrained_weights/s2.hdf5
+```
 
 #### Please be in touch with arielephrat@cs.huji.ac.il with any questions or bug reports. Enjoy!
