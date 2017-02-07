@@ -1,4 +1,4 @@
-# vid2speech - work in progress...
+# vid2speech
 
 This is the code for the paper  
 **[Vid2speech: Speech Reconstruction from Silent Video](http://www.cs.huji.ac.il/~peleg/papers/arXiv1701.00495-Vid2Speech.pdf)**
@@ -43,6 +43,8 @@ cd ../code
 python process_data.py
 python train.py
 ```
+Training one one entire GRID speaker (1000 videos) with the supplied settings takes ~12 hours on one Titan Black GPU.
+
 ## Generate video samples with reconstructed audio
 ```shell
 python gen_samples.py
