@@ -72,7 +72,9 @@ def main():
     Yte_pred = np.load(join(respath,'Yte_pred.npy'))
     lsf,g = get_lsf(Yte, Yte_pred)
     # Choose N_SAMPLES random test videos to reconstruct
-    ind = np.random.choice(int((1-TRAIN_PER)*len(vidfiles)),N_SAMPLES,replace=False)
+    n_test = int((1-TRAIN_PER)*len(vidfiles))
+    n_samples = min(n_test-1, N_SAMPLES)
+    ind = np.random.choice(n_test,n_samples,replace=False)
     for i in ind:
         offset = int(TRAIN_PER*len(vidfiles))
         vf = VIDPATH+vidfiles[i+offset]
