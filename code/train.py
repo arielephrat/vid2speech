@@ -28,8 +28,8 @@ nb_pool = 2
 BATCH_SIZE = 32
 DROPOUT = 0.25 
 DROPOUT2 = 0.5
-EPOCHS = 20
-FINETUNE_EPOCHS = 5
+EPOCHS = 60
+FINETUNE_EPOCHS = 10
 activation_func2 = 'tanh'
 
 respath = '../results/'

@@ -3,8 +3,6 @@ import os
 from os import listdir
 from os.path import isfile, join
 import sys
-import librosa
-import librosa.feature
 import audio_tools as aud
 import moviepy.editor as mpy
 import argparse
