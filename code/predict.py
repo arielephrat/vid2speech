@@ -12,10 +12,12 @@ DATAPATH = '../dataset/'
 
 def get_args():
     parser = argparse.ArgumentParser(description="Use pretrained model to get predictions for data in ../dataset/")
-    parser.add_argument('--weight_path',
+    parser.add_argument(
+    	'--weight_path',
         type=str,
         default=None,
-        help='path to saved pretrained model weights')
+        help='path to saved pretrained model weights'
+    )
     args = parser.parse_args()
     return args
 

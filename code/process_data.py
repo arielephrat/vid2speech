@@ -3,8 +3,8 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 import sys
-import librosa
 import audio_tools as aud
+import audio_read as ar
 
 SR = 8000
 FPS = 25
@@ -41,7 +41,7 @@ def process_video(vf, viddata, vidctr, faceCascade):
 			scaleFactor=1.05,
 			minNeighbors=3,
 			minSize=(200,200),
-			flags = cv2.cv.CV_HAAR_SCALE_IMAGE
+			flags = 2
 		)
 		if len(faces)==0 or len(faces)>1:
 			print ('Face detection error in %s frame: %d'%(vf, i))							
@@ -60,7 +60,7 @@ def process_video(vf, viddata, vidctr, faceCascade):
 
 def process_audio(af, auddata, audctr):
 	# audio processing
-	(y,sr) = librosa.load(af,sr=SR)
+	(y,sr) = ar.audio_read(af,sr=SR)
 	win_length = SPF
 	hop_length = int(SPF*OVERLAP)
 	[a,g,e] = aud.lpc_analysis(y,LPC_ORDER,window_step=hop_length,window_size=win_length)

@@ -20,9 +20,9 @@ If you find this code useful for your research, please cite
 ```
 
 ## Requirements
-The code depends on keras, h5py, numpy and librosa, all of which can be easily installed using pip:
+The code depends on keras, h5py, numpy, cv2 and scipy, all of which can be easily installed using pip:
 ```shell
-pip install keras h5py numpy librosa
+pip install keras h5py numpy scipy opencv-python
 ```  
 Keras was used with the TensorFlow backend. 
 

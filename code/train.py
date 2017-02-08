@@ -11,10 +11,6 @@ import numpy as np
 import sys
 from os.path import isfile, join
 import shutil
-import scipy.io, scipy.stats
-import librosa.display, librosa.output
-import scipy.io.wavfile as wav
-import matplotlib.pyplot as plt
 import h5py
 import os.path
 import glob
