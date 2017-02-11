@@ -1,7 +1,7 @@
 # vid2speech
 
 This is the code for the paper  
-**[Vid2speech: Speech Reconstruction from Silent Video](http://www.cs.huji.ac.il/~peleg/papers/arXiv1701.00495-Vid2Speech.pdf)**
+**[Vid2speech: Speech Reconstruction from Silent Video](http://www.vision.huji.ac.il/vid2speech/)**
 <br>
 [Ariel Ephrat](http://www.cs.huji.ac.il/~arielephrat/) and
 [Shmuel Peleg](http://www.cs.huji.ac.il/~peleg/)
