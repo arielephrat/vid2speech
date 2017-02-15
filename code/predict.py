@@ -21,19 +21,29 @@ def get_args():
     args = parser.parse_args()
     return args
 
+def standardize_data(viddata, auddata):
+	viddata = viddata.astype('float32')
+	viddata /= 255
+	viddata_mean = np.mean(viddata)
+	viddata = viddata-viddata_mean
+	auddata_means = np.mean(auddata,axis=0) 
+	auddata_stds = np.std(auddata, axis=0)
+	auddata_norm = ((auddata-auddata_means)/auddata_stds)
+	return viddata, auddata_norm, auddata_means, auddata_stds
+
 def main():
 	args = get_args()
 	weight_path = args.weight_path
 	if not os.path.exists(RESPATH):
 		os.makedirs(RESPATH)
-	(Xtr,Ytr), (Xte, Yte) = train.load_data(DATAPATH)
-	net_out = Ytr.shape[1]
-	Xtr, Ytr_norm, Xte, Yte_norm, Y_means, Y_stds = train.standardize_data(Xtr, Ytr, Xte, Yte)
+	viddata, auddata = train.load_data(DATAPATH)
+	net_out = auddata.shape[1]
+	viddata, auddata_norm, auddata_means, auddata_stds = standardize_data(viddata, auddata)
 	model = train.build_model(net_out)
 	model.compile(loss='mse', optimizer='adam')
 	model.load_weights(weight_path)
-	Ytr_pred, Yte_pred = train.predict(model, Xtr, Xte, Y_means, Y_stds)
-	train.savedata(Ytr, Ytr_pred, Yte, Yte_pred, respath = RESPATH)
+	aud_pred = train.predict(model, viddata, auddata_means, auddata_stds)
+	np.save(join(RESPATH,'aud_pred.npy'),aud_pred)
 
 if __name__ == "__main__":
 	main()

@@ -45,15 +45,19 @@ def load_data(datapath):
 		auddata = np.load(auddata_path)
 		vidctr = len(auddata)
 		print ('Done.')
+		return viddata, auddata
 	else:
 		print ('Preprocessed data not found.')
 		sys.exit()
 
+def split_data(viddata, auddata):
+	vidctr = len(auddata)
 	Xtr = viddata[:int(vidctr*TRAIN_PER),:,:,:]
 	Ytr = auddata[:int(vidctr*TRAIN_PER),:]
 	Xte = viddata[int(vidctr*TRAIN_PER):,:,:,:]
 	Yte = auddata[int(vidctr*TRAIN_PER):,:]
 	return (Xtr, Ytr), (Xte, Yte)
+
 
 def build_model(net_out):
 	model = Sequential()
@@ -140,23 +144,23 @@ def train_net(model, Xtr, Ytr_norm, Xte, Yte_norm, batch_size=BATCH_SIZE, epochs
 	model.load_weights(newest)
 	return model
 
-def predict(model, Xtr, Xte, Y_means, Y_stds, batch_size=BATCH_SIZE):
-	Ytr_pred = model.predict(Xtr, batch_size=batch_size, verbose=1)
-	Yte_pred = model.predict(Xte, batch_size=batch_size, verbose=1)
-	Ytr_pred = (Ytr_pred*Y_stds+Y_means)
-	Yte_pred = (Yte_pred*Y_stds+Y_means)
-	return Ytr_pred, Yte_pred
+def predict(model, X, Y_means, Y_stds, batch_size=BATCH_SIZE):
+	Y_pred = model.predict(X, batch_size=batch_size, verbose=1)
+	Y_pred = (Y_pred*Y_stds+Y_means)
+	return Y_pred
 
 def main():
 	if not os.path.exists(weight_path):
 		os.makedirs(weight_path)
-	(Xtr,Ytr), (Xte, Yte) = load_data(datapath)
+	viddata, auddata = load_data(datapath)	
+	(Xtr,Ytr), (Xte, Yte) = split_data(viddata, auddata)
 	net_out = Ytr.shape[1]
 	Xtr, Ytr_norm, Xte, Yte_norm, Y_means, Y_stds = standardize_data(Xtr, Ytr, Xte, Yte)
 	model = build_model(net_out)
 	model = train_net(model, Xtr, Ytr_norm, Xte, Yte_norm)
 	model = train_net(model, Xtr, Ytr_norm, Xte, Yte_norm, epochs=FINETUNE_EPOCHS, finetune=True)
-	Ytr_pred, Yte_pred = predict(model, Xtr, Xte, Y_means, Y_stds)
+	Ytr_pred = predict(model, Xtr, Y_means, Y_stds)
+	Yte_pred = predict(model, Xte, Y_means, Y_stds)
 	savedata(Ytr, Ytr_pred, Yte, Yte_pred)
 
 if __name__ == "__main__":

@@ -35,20 +35,12 @@ def get_args():
     args = parser.parse_args()
     return args
 
-def get_lsf(Yte, Yte_pred):
-    lsf_te = Yte[:,:-2]
-    lsf_te2 = np.zeros((lsf_te.shape[0]*2,lsf_te.shape[1]/2))
-    lsf_te2[::2,:] = lsf_te[:,:LPC_ORDER]
-    lsf_te2[1::2,:] = lsf_te[:,LPC_ORDER:]
-    lsf_tepr = Yte_pred[:,:-2]
+def get_lsf(Y_pred):
+    lsf_tepr = Y_pred[:,:-2]
     lsf_tepr2 = np.zeros((lsf_tepr.shape[0]*2,lsf_tepr.shape[1]/2))
     lsf_tepr2[::2,:] = lsf_tepr[:,:LPC_ORDER]
     lsf_tepr2[1::2,:] = lsf_tepr[:,LPC_ORDER:]
-    g_te = Yte[:,-2:]
-    g_te2 = np.zeros((g_te.shape[0]*2,1))
-    g_te2[::2,:] = g_te[:,:1]
-    g_te2[1::2,:] = g_te[:,1:]
-    g_tepr = Yte_pred[:,-2:]
+    g_tepr = Y_pred[:,-2:]
     g_tepr2 = np.zeros((g_tepr.shape[0]*2,1))
     g_tepr2[::2,:] = g_tepr[:,:1]
     g_tepr2[1::2,:] = g_tepr[:,1:]
@@ -66,15 +58,25 @@ def main():
     if not os.path.exists(sample_path):
         os.makedirs(sample_path)
     vidfiles = [f for f in listdir(VIDPATH) if isfile(join(VIDPATH, f)) and f.endswith(".mpg")]
-    Yte = np.load(join(respath,'Yte.npy'))
-    Yte_pred = np.load(join(respath,'Yte_pred.npy'))
-    lsf,g = get_lsf(Yte, Yte_pred)
+    if isfile(join(respath,'Yte_pred.npy')):
+        Y_pred = np.load(join(respath,'Yte_pred.npy'))
+    elif isfile(join(respath,'aud_pred.npy')):
+        Y_pred = np.load(join(respath,'aud_pred.npy'))
+    else:
+        print ('No results found.')
+        sys.exit()
+    lsf,g = get_lsf(Y_pred)
     # Choose N_SAMPLES random test videos to reconstruct
-    n_test = int((1-TRAIN_PER)*len(vidfiles))
-    n_samples = min(n_test-1, N_SAMPLES)
+    if respath==RESPATH:
+        n_test = int((1-TRAIN_PER)*len(vidfiles))
+        n_samples = min(n_test-1, N_SAMPLES)
+        offset = int(TRAIN_PER*len(vidfiles))
+    else:
+        n_test = len(vidfiles)
+        n_samples = min(N_SAMPLES, len(vidfiles)-1)
+        offset = 0
     ind = np.random.choice(n_test,n_samples,replace=False)
     for i in ind:
-        offset = int(TRAIN_PER*len(vidfiles))
         vf = VIDPATH+vidfiles[i+offset]
         clip = mpy.VideoFileClip(vf)
         lpc_i = aud.lsf_to_lpc(lsf[i*STEP:(i+1)*STEP,:])
